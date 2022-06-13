@@ -1,7 +1,7 @@
 package com.sea.service;
 
-import com.sea.dto.RegisterAppDTO;
-import com.sea.dto.UnregisterAppDTO;
+import com.sea.pojo.dto.RegisterAppDTO;
+import com.sea.pojo.dto.UnregisterAppDTO;
 
 public interface AppService {
     /**

@@ -24,7 +24,6 @@ public class OkhttpTool {
                 .build();
     }
 
-
     public static <T> void post(String url, T t) {
         RequestBody requestBody = RequestBody.create(MediaType.parse(HTTP_JSON), gson.toJson(t));
         Request request = new Request.Builder()

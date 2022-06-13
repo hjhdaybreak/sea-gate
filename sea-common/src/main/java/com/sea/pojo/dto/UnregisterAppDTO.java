@@ -1,4 +1,4 @@
-package com.sea.dto;
+package com.sea.pojo.dto;
 
 public class UnregisterAppDTO {
 

@@ -1,7 +1,7 @@
 package com.sea.controller;
 
-import com.sea.dto.RegisterAppDTO;
-import com.sea.dto.UnregisterAppDTO;
+import com.sea.pojo.dto.RegisterAppDTO;
+import com.sea.pojo.dto.UnregisterAppDTO;
 import com.sea.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +18,7 @@ public class AppController {
     private AppService appService;
 
     @PostMapping("/register")
-    public void register(@RequestBody @Validated RegisterAppDTO registerAppDTO) {
+    public void register(@RequestBody RegisterAppDTO registerAppDTO) {
         appService.register(registerAppDTO);
     }
 
