@@ -8,3 +8,6 @@ spring:
     username: root
     password: hjh20001117
     driver-class-name: com.mysql.jdbc.Driver
+
+sea:
+  server-web-socket-url: ws://127.0.0.1:9999

@@ -1,21 +1,30 @@
 package com.sea.constant;
 
 public enum MatchMethodEnum {
+    /**
+     * =
+     */
+    EQUAL((byte)1, "="),
+    /**
+     * regex
+     */
+    REGEX((byte)2, "regex"),
+    /**
+     * like
+     */
+    LIKE((byte)3, "like");
 
-    EQUAL(1, "="),
-    REGEX(2, "regex"),
-    LIKE(3, "like");
 
-    private Integer code;
+    private Byte code;
 
     private String desc;
 
-    MatchMethodEnum(Integer code, String desc) {
+    MatchMethodEnum(Byte code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public Integer getCode() {
+    public Byte getCode() {
         return code;
     }
 

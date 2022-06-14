@@ -1,18 +1,11 @@
-package com.sea.bean;
+package com.sea.pojo.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.time.LocalDateTime;
-
-@TableName("t_route_rule")
-public class RouteRule {
-
-    @TableId(type = IdType.AUTO)
+public class AppRuleDTO {
     private Integer id;
 
     private Integer appId;
+
+    private String appName;
 
     private String version;
 
@@ -23,10 +16,6 @@ public class RouteRule {
     private Byte matchMethod;
 
     private String matchRule;
-
-    private Byte enabled;
-
-    private LocalDateTime createdTime;
 
     private Integer priority;
 
@@ -44,6 +33,14 @@ public class RouteRule {
 
     public void setAppId(Integer appId) {
         this.appId = appId;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
     public String getVersion() {
@@ -84,22 +81,6 @@ public class RouteRule {
 
     public void setMatchRule(String matchRule) {
         this.matchRule = matchRule;
-    }
-
-    public Byte getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Byte enabled) {
-        this.enabled = enabled;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
     }
 
     public Integer getPriority() {

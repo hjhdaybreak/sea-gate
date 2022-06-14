@@ -7,6 +7,7 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sea.constant.AdminConstants;
+import com.sea.constant.NacosConstants;
 import com.sea.pojo.dto.RegisterAppDTO;
 import com.sea.pojo.dto.UnregisterAppDTO;
 import com.sea.exception.SeaException;
@@ -92,27 +93,22 @@ public class AutoRegisterListener implements ApplicationListener<ContextRefreshe
         Map<String, String> metadataMap = new HashMap<>();
         metadataMap.put("version", properties.getVersion());
         metadataMap.put("appName", properties.getAppName());
-
         instance.setMetadata(metadataMap);
 
-        List<String> serviceNames = getAllServiceName();
-        for (String serviceName : serviceNames) {
-            pool.execute(() -> {
-                try {
-                    LOGGER.debug("注册实例 serviceName {}, instance {}", serviceName, gson.toJson(instance));
-                    namingService.registerInstance(serviceName, instance);
-                } catch (NacosException e) {
-                    LOGGER.error("register to nacos fail", e);
-                    throw new SeaException("register to nacos fail");
-                }
-            });
+        try {
+            namingService.registerInstance("sea:" + properties.getAppName(), NacosConstants.APP_GROUP_NAME, instance);
+        } catch (NacosException e) {
+            LOGGER.error("register to nacos fail", e);
+            throw new SeaException(e.getErrCode(), e.getErrMsg());
         }
+
+        // todo check register result
         LOGGER.info("register interface info to nacos successfully!");
         String url = "http://" + properties.getAdminUrl() + AdminConstants.REGISTER_PATH;
         RegisterAppDTO registerAppDTO = buildRegisterAppDTO(instance);
         OkhttpTool.post(url, registerAppDTO);
 
-        LOGGER.info("register to ship-admin success! ");
+        LOGGER.info("register to sea-admin success! ");
     }
 
     private RegisterAppDTO buildRegisterAppDTO(Instance instance) {
@@ -125,7 +121,6 @@ public class AutoRegisterListener implements ApplicationListener<ContextRefreshe
         registerAppDTO.setPort(instance.getPort());
 
         return registerAppDTO;
-
 
     }
 

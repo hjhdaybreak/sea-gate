@@ -13,6 +13,11 @@ public class SeaException extends RuntimeException {
         this.errMsg = errMsg;
     }
 
+    public SeaException(Integer code, String errMsg) {
+        this.code = code;
+        this.errMsg = errMsg;
+    }
+
     public SeaException(SeaExceptionEnum exceptionEnum) {
         super(exceptionEnum.getMsg());
         this.code = exceptionEnum.getCode();

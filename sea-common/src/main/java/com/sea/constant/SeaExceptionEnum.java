@@ -1,7 +1,19 @@
 package com.sea.constant;
 
 public enum SeaExceptionEnum {
-    PARAM_ERROR(1000, "参数错误");
+
+    /**
+     * param error
+     */
+    PARAM_ERROR(1000, "param error"),
+    /**
+     * service not find
+     */
+    SERVICE_NOT_FIND(1001, "service not find,maybe not register"),
+    /**
+     * invalid config
+     */
+    CONFIG_ERROR(1002, "invalid config");
 
     private Integer code;
     private String msg;
