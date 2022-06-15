@@ -31,7 +31,6 @@ public class WebsocketSyncCacheServer extends WebSocketServer {
         this.messageHandler = new MessageHandler();
     }
 
-
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         LOGGER.info("server is open");

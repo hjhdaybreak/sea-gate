@@ -12,6 +12,7 @@ import com.sea.constant.NacosConstants;
 import com.sea.pojo.dto.ServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.util.CollectionUtils;
 
@@ -21,13 +22,12 @@ import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+@Configuration
 public class DataSyncTaskListener implements ApplicationListener<ContextRefreshedEvent> {
 
     private static ScheduledThreadPoolExecutor scheduledPool = new ScheduledThreadPoolExecutor(1,
             new ThreadFactoryBuilder().setNameFormat("service-sync-%d").build());
 
-    private static ScheduledThreadPoolExecutor rulePool = new ScheduledThreadPoolExecutor(1,
-            new ThreadFactoryBuilder().setNameFormat("route-rule-sync-%d").build());
 
     @NacosInjected
     private NamingService namingService;

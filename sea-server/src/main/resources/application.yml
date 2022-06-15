@@ -10,4 +10,4 @@ sea:
     load-balance: round
     time-out-millis: 3000
     cache-refresh-interval: 10
-    web-socket-port: 999
+    web-socket-port: 9999

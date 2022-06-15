@@ -79,6 +79,7 @@ public class DynamicRoutePlugin extends AbstractSeaPlugin {
         return forward(exchange, url);
     }
 
+    // 转发,带有超时转发
     private Mono<Void> forward(ServerWebExchange exchange, String url) {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();

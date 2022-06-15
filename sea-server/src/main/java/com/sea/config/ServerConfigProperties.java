@@ -5,6 +5,7 @@ import com.sea.constant.SeaExceptionEnum;
 import com.sea.exception.SeaException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 @ConfigurationProperties(prefix = "sea.gate")
 public class ServerConfigProperties implements InitializingBean {

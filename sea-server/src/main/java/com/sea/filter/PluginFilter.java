@@ -2,6 +2,7 @@ package com.sea.filter;
 
 import com.sea.chain.PluginChain;
 import com.sea.config.ServerConfigProperties;
+import com.sea.plugin.AuthPlugin;
 import com.sea.plugin.DynamicRoutePlugin;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -21,7 +22,7 @@ public class PluginFilter implements WebFilter {
 
         PluginChain pluginChain = new PluginChain();
         pluginChain.addPlugin(new DynamicRoutePlugin(properties));
-
+        pluginChain.addPlugin(new AuthPlugin(properties));
         return pluginChain.execute(serverWebExchange, pluginChain);
 
     }

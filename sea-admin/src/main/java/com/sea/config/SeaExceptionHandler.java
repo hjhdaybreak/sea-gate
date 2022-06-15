@@ -16,28 +16,28 @@ public class SeaExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public Result<Void> handlerBusinessException(Exception exception) {
-        return Result.error(transferToShipException(exception));
+        return Result.error(transferToSeaException(exception));
     }
 
-    private SeaException transferToShipException(Exception exception) {
-        SeaException shipException;
+    private SeaException transferToSeaException(Exception exception) {
+        SeaException seaException;
         if (exception instanceof SeaException) {
-            shipException = (SeaException) exception;
+            seaException = (SeaException) exception;
 
         } else if (exception instanceof BindException) {
             BindException bindException = (BindException) exception;
             BindingResult bindingResult = bindException.getBindingResult();
-            shipException = new SeaException(getErrorMsg(bindingResult));
+            seaException = new SeaException(getErrorMsg(bindingResult));
 
         } else if (exception instanceof MethodArgumentNotValidException) {
             MethodArgumentNotValidException validException = (MethodArgumentNotValidException) exception;
             BindingResult bindingResult = validException.getBindingResult();
-            shipException = new SeaException(getErrorMsg(bindingResult));
+            seaException = new SeaException(getErrorMsg(bindingResult));
 
         } else {
-            shipException = new SeaException(exception.getMessage());
+            seaException = new SeaException(exception.getMessage());
         }
-        return shipException;
+        return seaException;
     }
 
     private String getErrorMsg(BindingResult bindingResult) {

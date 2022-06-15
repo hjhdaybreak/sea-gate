@@ -18,9 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.*;
@@ -35,13 +32,11 @@ public class AutoRegisterListener implements ApplicationListener<ContextRefreshe
 
     private final ClientConfigProperties properties;
 
-
     @NacosInjected
     private NamingService namingService;
 
     @Autowired
     private RequestMappingHandlerMapping handlerMapping;
-
 
     private final ExecutorService pool;
 
@@ -79,36 +74,31 @@ public class AutoRegisterListener implements ApplicationListener<ContextRefreshe
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             OkhttpTool.post(url, unregisterAppDTO);
-            LOGGER.info(unregisterAppDTO.getAppName() + ":" + unregisterAppDTO.getVersion() + "unregister from ship-admin success!");
+            LOGGER.info(unregisterAppDTO.getAppName() + ":" + unregisterAppDTO.getVersion() + "unregister from sea-admin success!");
         }));
     }
 
     private void doRegister() {
         Instance instance = new Instance();
-
         instance.setIp(IpUtil.getLocalIpAddress());
         instance.setPort(properties.getPort());
-        instance.setEphemeral(true);//是否为临时实例,不持久化
-
+        instance.setEphemeral(true);
         Map<String, String> metadataMap = new HashMap<>();
         metadataMap.put("version", properties.getVersion());
         metadataMap.put("appName", properties.getAppName());
         instance.setMetadata(metadataMap);
-
         try {
-            namingService.registerInstance("sea:" + properties.getAppName(), NacosConstants.APP_GROUP_NAME, instance);
+            namingService.registerInstance(properties.getAppName(), NacosConstants.APP_GROUP_NAME, instance);
         } catch (NacosException e) {
             LOGGER.error("register to nacos fail", e);
             throw new SeaException(e.getErrCode(), e.getErrMsg());
         }
-
-        // todo check register result
-        LOGGER.info("register interface info to nacos successfully!");
+        LOGGER.info("register interface info to nacos success!");
+        // send register request to ship-admin
         String url = "http://" + properties.getAdminUrl() + AdminConstants.REGISTER_PATH;
         RegisterAppDTO registerAppDTO = buildRegisterAppDTO(instance);
         OkhttpTool.post(url, registerAppDTO);
-
-        LOGGER.info("register to sea-admin success! ");
+        LOGGER.info("register to sea-admin success!");
     }
 
     private RegisterAppDTO buildRegisterAppDTO(Instance instance) {
@@ -122,27 +112,6 @@ public class AutoRegisterListener implements ApplicationListener<ContextRefreshe
 
         return registerAppDTO;
 
-    }
-
-    private List<String> getAllServiceName() {
-        List<String> serviceNames = new ArrayList<>();
-        Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
-        for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
-            RequestMappingInfo mappingInfo = entry.getKey();
-            HandlerMethod method = entry.getValue();
-            PatternsRequestCondition patternsCondition = mappingInfo.getPatternsCondition();
-            serviceNames.addAll(patternsCondition.getPatterns());
-        }
-
-        List<String> result = new ArrayList<>();
-        for (String serviceName : serviceNames) {
-            if (ignoreUrlList.contains(serviceName)) {
-                continue;
-            }
-            String url = properties.getContextPath() + serviceName;
-            result.add(url.replace("/", ".") + ":" + properties.getVersion());
-        }
-        return result;
     }
 
     private boolean check(ClientConfigProperties configProperties) {

@@ -1,0 +1,22 @@
+sea:
+  http:
+    app-name: order
+    version: gray_1.0
+    context-path: /order
+    port: 8082
+    admin-url: 127.0.0.1:9001
+
+server:
+  port: 8082
+
+nacos:
+  discovery:
+    server-addr: 127.0.0.1:8848
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/sea?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&tinyInt1isBit=false
+    username: root
+    password: hjh20001117
+    driver-class-name: com.mysql.cj.jdbc.Driver
