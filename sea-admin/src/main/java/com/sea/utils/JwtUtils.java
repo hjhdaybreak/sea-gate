@@ -41,6 +41,7 @@ public class JwtUtils {
             String signature = HMACSHA256(array[0] + "." + array[1], SECRET);
             return signature.equals(array[2]);
         } catch (Exception e) {
+
         }
         return false;
     }

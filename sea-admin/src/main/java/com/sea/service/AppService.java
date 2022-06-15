@@ -1,5 +1,7 @@
 package com.sea.service;
 
+import com.sea.pojo.ChangeStatusDTO;
+import com.sea.pojo.vo.AppVO;
 import com.sea.pojo.dto.AppInfoDTO;
 import com.sea.pojo.dto.RegisterAppDTO;
 import com.sea.pojo.dto.UnregisterAppDTO;
@@ -23,4 +25,10 @@ public interface AppService {
 
 
     List<AppInfoDTO> getAppInfos(List<String> appNames);
+
+    List<AppVO> getList();
+
+    void updateEnabled(ChangeStatusDTO statusDTO);
+
+    void delete(Integer id);
 }

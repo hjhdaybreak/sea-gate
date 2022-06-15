@@ -8,11 +8,12 @@ public class AppInfoDTO {
 
     private String appName;
 
+
     private List<ServiceInstance> instances;
 
-    /**
-     * TODO ??? 插件代码 code ?
-     */
+
+    private Byte enabled;
+
     private List<String> enabledPlugins;
 
     public Integer getAppId() {
@@ -46,4 +47,13 @@ public class AppInfoDTO {
     public void setEnabledPlugins(List<String> enabledPlugins) {
         this.enabledPlugins = enabledPlugins;
     }
+
+    public Byte getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Byte enabled) {
+        this.enabled = enabled;
+    }
+
 }

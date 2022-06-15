@@ -44,7 +44,7 @@ public class OkhttpTool {
         }
     }
 
-    // TODO 这里为啥不用 JSON
+
     public static String doPut(String url, Map<String, Object> queryParamMap, String body) {
         String requestUrl = null;
         if (queryParamMap == null) {

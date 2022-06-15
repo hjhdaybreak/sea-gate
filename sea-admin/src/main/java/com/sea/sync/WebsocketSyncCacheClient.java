@@ -89,7 +89,7 @@ public class WebsocketSyncCacheClient {
 
     public <T> void send(T t) {
         while (!client.getReadyState().equals(ReadyState.OPEN)) {
-            LOGGER.debug("connecting ...please wait");
+            throw new SeaException("Please check if the ship-server is started！");
         }
         client.send(gson.toJson(t));
     }

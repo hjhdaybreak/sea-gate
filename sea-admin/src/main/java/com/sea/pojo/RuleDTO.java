@@ -1,23 +1,19 @@
-package com.sea.bean;
+package com.sea.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
-
-@TableName("t_route_rule")
-public class RouteRule {
-
-    @TableId(type = IdType.AUTO)
-    private Integer id;
-
+public class RuleDTO {
+    @NotNull(message = "appId不能为空")
     private Integer appId;
 
+    @NotEmpty(message = "name不能为空")
     private String name;
 
+    @NotEmpty(message = "version不能为空")
     private String version;
 
+    @NotEmpty(message = "matchObject不能为空")
     private String matchObject;
 
     private String matchKey;
@@ -26,28 +22,17 @@ public class RouteRule {
 
     private String matchRule;
 
-    private Byte enabled;
-
-    private LocalDateTime createdTime;
-
+    @NotNull(message = "priority不能为空")
     private Integer priority;
 
+    private Byte enabled;
 
-    public String getName() {
-        return name;
+    public Byte getEnabled() {
+        return enabled;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    public void setEnabled(Byte enabled) {
+        this.enabled = enabled;
     }
 
     public Integer getAppId() {
@@ -56,6 +41,14 @@ public class RouteRule {
 
     public void setAppId(Integer appId) {
         this.appId = appId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getVersion() {
@@ -96,22 +89,6 @@ public class RouteRule {
 
     public void setMatchRule(String matchRule) {
         this.matchRule = matchRule;
-    }
-
-    public Byte getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Byte enabled) {
-        this.enabled = enabled;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
     }
 
     public Integer getPriority() {

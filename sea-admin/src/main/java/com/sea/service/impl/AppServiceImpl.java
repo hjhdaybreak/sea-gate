@@ -10,6 +10,8 @@ import com.sea.constant.EnabledEnum;
 import com.sea.bean.App;
 import com.sea.bean.AppInstance;
 import com.sea.pojo.AppPluginDTO;
+import com.sea.pojo.ChangeStatusDTO;
+import com.sea.pojo.vo.AppVO;
 import com.sea.pojo.dto.AppInfoDTO;
 import com.sea.pojo.dto.RegisterAppDTO;
 import com.sea.pojo.dto.ServiceInstance;
@@ -21,6 +23,7 @@ import com.sea.mapper.AppPluginMapper;
 import com.sea.mapper.PluginMapper;
 import com.sea.service.AppService;
 import com.sea.transfer.AppInstanceTransfer;
+import com.sea.transfer.AppVOTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -148,12 +151,14 @@ public class AppServiceImpl implements AppService {
         return buildAppInfos(apps, appInstances, appPluginDTOS);
     }
 
+
     private List<AppInfoDTO> buildAppInfos(List<App> apps, List<AppInstance> appInstances, List<AppPluginDTO> appPluginDTOS) {
         List<AppInfoDTO> list = Lists.newArrayList();
         for (App app : apps) {
             AppInfoDTO appInfoDTO = new AppInfoDTO();
             appInfoDTO.setAppId(app.getId());
             appInfoDTO.setAppName(app.getAppName());
+            appInfoDTO.setEnabled(app.getEnabled());
             List<String> enabledPlugins = new ArrayList<>();
             for (AppPluginDTO appPluginDTO : appPluginDTOS) {
                 if (appPluginDTO.getAppId().equals(app.getId())) {
@@ -186,5 +191,41 @@ public class AppServiceImpl implements AppService {
         QueryWrapper<App> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(App::getAppName, appName);
         return appMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public List<AppVO> getList() {
+        QueryWrapper<App> wrapper = new QueryWrapper<>();
+        List<App> apps = appMapper.selectList(wrapper);
+        if (CollectionUtils.isEmpty(apps)) {
+            return Lists.newArrayList();
+        }
+        List<AppVO> appVOS = AppVOTransfer.INSTANCE.mapToVOList(apps);
+        appVOS.forEach(appVO -> appVO.setInstanceNum(2));
+        return appVOS;
+    }
+
+
+    /**
+     * if disable the app,it will make all instances offline
+     * @param statusDTO
+     */
+    @Override
+    public void updateEnabled(ChangeStatusDTO statusDTO) {
+        App app = new App();
+        app.setId(statusDTO.getId());
+        app.setEnabled(statusDTO.getEnabled());
+        appMapper.updateById(app);
+    }
+
+    @Override
+    public void delete(Integer id) {
+        QueryWrapper<AppInstance> wrapper = new QueryWrapper<>();
+        wrapper.lambda().eq(AppInstance::getAppId, id);
+        List<AppInstance> instances = instanceMapper.selectList(wrapper);
+        if (!CollectionUtils.isEmpty(instances)) {
+            throw new SeaException("该服务存在实例不可删除！");
+        }
+        appMapper.deleteById(id);
     }
 }

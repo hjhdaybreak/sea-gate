@@ -6,6 +6,7 @@ import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.ListView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sea.constant.EnabledEnum;
 import com.sea.constant.NacosConstants;
 import com.sea.pojo.NacosMetadata;
 import com.sea.pojo.dto.AppInfoDTO;
@@ -118,6 +119,7 @@ public class NacosSyncListener implements ApplicationListener<ContextRefreshedEv
 
             map.put("metadata", StringTools.urlEncode(gson.toJson(metadata)));
             map.put("ephemeral", true);
+            map.put("enabled", EnabledEnum.ENABLE.getCode().equals(appInfo.getEnabled()));
             return map;
         }
     }

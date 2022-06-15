@@ -11,6 +11,7 @@ public class SeaException extends RuntimeException {
     public SeaException(String errMsg) {
         super(errMsg);
         this.errMsg = errMsg;
+        this.code = 5000;
     }
 
     public SeaException(Integer code, String errMsg) {

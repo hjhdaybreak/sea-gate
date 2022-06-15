@@ -67,6 +67,7 @@ public class DataSyncTaskListener implements ApplicationListener<ContextRefreshe
                     return;
                 }
                 List<String> appNames = services.getData();
+                List<String> onlineAppNames = new ArrayList<>();
                 // get all instances
                 for (String appName : appNames) {
                     List<Instance> instanceList = namingService.getAllInstances(appName, NacosConstants.APP_GROUP_NAME);
@@ -74,16 +75,19 @@ public class DataSyncTaskListener implements ApplicationListener<ContextRefreshe
                         continue;
                     }
                     ServiceCache.add(appName, buildServiceInstances(instanceList));
-                    PluginCache.add(appName, getEnabledPlugins(instanceList));
+                    List<String> pluginNames = getEnabledPlugins(instanceList);
+                    PluginCache.add(appName, pluginNames);
+                    onlineAppNames.add(appName);
                 }
-                ServiceCache.removeExpired(appNames);
-                PluginCache.removeExpired(appNames);
+                ServiceCache.removeExpired(onlineAppNames);
+                PluginCache.removeExpired(onlineAppNames);
+
             } catch (NacosException e) {
                 e.printStackTrace();
             }
         }
 
-        //TODO ????
+
         private List<String> getEnabledPlugins(List<Instance> instanceList) {
             Instance instance = instanceList.get(0);
             Map<String, String> metadata = instance.getMetadata();

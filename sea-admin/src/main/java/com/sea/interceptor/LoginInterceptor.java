@@ -3,6 +3,7 @@ package com.sea.interceptor;
 import com.sea.constant.AdminConstants;
 import com.sea.constant.SeaExceptionEnum;
 import com.sea.exception.SeaException;
+import com.sea.pojo.PayLoad;
 import com.sea.utils.JwtUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -19,7 +20,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         String token = null;
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            throw new SeaException(SeaExceptionEnum.NOT_LOGIN);
+            response.sendRedirect("/user/login/page");
+            return false;
         }
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(AdminConstants.TOKEN_NAME)) {
@@ -27,12 +29,15 @@ public class LoginInterceptor implements HandlerInterceptor {
             }
         }
         if (StringUtils.isEmpty(token)) {
-            throw new SeaException(SeaExceptionEnum.NOT_LOGIN);
+            response.sendRedirect("/user/login/page");
+            return false;
         }
         boolean result = JwtUtils.checkSignature(token);
         if (!result) {
             throw new SeaException(SeaExceptionEnum.TOKEN_ERROR);
         }
+        PayLoad payLoad = JwtUtils.getPayLoad(token);
+        request.setAttribute("currUser", payLoad.getName());
         return true;
     }
 }
