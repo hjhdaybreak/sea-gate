@@ -73,7 +73,7 @@ public class AutoRegisterListener implements ApplicationListener<ContextRefreshe
         unregisterAppDTO.setVersion(properties.getVersion());
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            OkhttpTool.post(url, unregisterAppDTO);
+            OkhttpTool.doPost(url, unregisterAppDTO);
             LOGGER.info(unregisterAppDTO.getAppName() + ":" + unregisterAppDTO.getVersion() + "unregister from sea-admin success!");
         }));
     }
@@ -97,7 +97,7 @@ public class AutoRegisterListener implements ApplicationListener<ContextRefreshe
         // send register request to ship-admin
         String url = "http://" + properties.getAdminUrl() + AdminConstants.REGISTER_PATH;
         RegisterAppDTO registerAppDTO = buildRegisterAppDTO(instance);
-        OkhttpTool.post(url, registerAppDTO);
+        OkhttpTool.doPost(url, registerAppDTO);
         LOGGER.info("register to sea-admin success!");
     }
 

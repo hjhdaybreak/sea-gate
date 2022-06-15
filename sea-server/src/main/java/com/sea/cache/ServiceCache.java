@@ -3,7 +3,7 @@ package com.sea.cache;
 import com.google.common.collect.Lists;
 import com.sea.pojo.dto.ServiceInstance;
 
-import java.util.LinkedList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -12,6 +12,7 @@ public class RouteRuleOperationDTO {
     private List<AppRuleDTO> ruleList;
 
     public RouteRuleOperationDTO() {
+
     }
 
     public RouteRuleOperationDTO(OperationTypeEnum operationTypeEnum, List<AppRuleDTO> ruleList) {

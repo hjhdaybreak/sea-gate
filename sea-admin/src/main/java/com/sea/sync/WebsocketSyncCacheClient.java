@@ -37,7 +37,7 @@ public class WebsocketSyncCacheClient {
     private Gson gson = new GsonBuilder().create();
 
     public WebsocketSyncCacheClient(@Value("${sea.server-web-socket-url}") String serverWebSocketUrl,
-                                       RuleService ruleService) {
+                                    RuleService ruleService) {
         if (StringUtils.isEmpty(serverWebSocketUrl)) {
             throw new SeaException(SeaExceptionEnum.CONFIG_ERROR);
         }
@@ -87,10 +87,10 @@ public class WebsocketSyncCacheClient {
     }
 
 
-    public void send(String content) {
+    public <T> void send(T t) {
         while (!client.getReadyState().equals(ReadyState.OPEN)) {
             LOGGER.debug("connecting ...please wait");
         }
-        client.send(content);
+        client.send(gson.toJson(t));
     }
 }

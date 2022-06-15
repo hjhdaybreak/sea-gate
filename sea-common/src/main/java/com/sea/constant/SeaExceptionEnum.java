@@ -13,7 +13,22 @@ public enum SeaExceptionEnum {
     /**
      * invalid config
      */
-    CONFIG_ERROR(1002, "invalid config");
+    CONFIG_ERROR(1002, "invalid config"),
+    /**
+     * token error
+     */
+    TOKEN_ERROR(1005, "token error"),
+
+    /**
+     * not login
+     */
+    NOT_LOGIN(1004, "not login"),
+
+    /**
+     * userName or password error
+     */
+    LOGIN_ERROR(1003, "userName or password error");
+
 
     private Integer code;
     private String msg;

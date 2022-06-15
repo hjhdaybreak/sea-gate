@@ -9,10 +9,11 @@ import java.util.List;
 
 @LoadBalanceAno(LoadBalanceConstants.ROUND)
 public class FullRoundBalance implements LoadBalance {
+
     private volatile int index;
 
     @Override
-    public ServiceInstance chooseOne(List<ServiceInstance> instances) {
+    public synchronized ServiceInstance chooseOne(List<ServiceInstance> instances) {
         if (index == instances.size()) {
             index = 0;
         }

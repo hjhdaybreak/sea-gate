@@ -12,10 +12,10 @@ import java.util.Random;
 @LoadBalanceAno(LoadBalanceConstants.RANDOM)
 public class RandomBalance implements LoadBalance {
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     @Override
-    public ServiceInstance chooseOne(List<ServiceInstance> instances) {
+    public synchronized ServiceInstance chooseOne(List<ServiceInstance> instances) {
         return instances.get(random.nextInt(instances.size()));
     }
 }

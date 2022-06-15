@@ -16,11 +16,15 @@ import com.sea.pojo.dto.AppRuleDTO;
 import com.sea.pojo.dto.ServiceInstance;
 import com.sea.spi.LoadBalance;
 import com.sea.utils.StringTools;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.server.RequestPath;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -30,24 +34,38 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
+
 
 public class DynamicRoutePlugin extends AbstractSeaPlugin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicRoutePlugin.class);
 
-    private WebClient webClient;
-
     private Gson gson = new GsonBuilder().create();
+
+    private static WebClient webClient;
+
+    static {
+        HttpClient httpClient = HttpClient.create()
+                .tcpConfiguration(client ->
+                        client.doOnConnected(conn ->
+                                        conn.addHandlerLast(new ReadTimeoutHandler(3))
+                                                .addHandlerLast(new WriteTimeoutHandler(3)))
+                                .option(ChannelOption.TCP_NODELAY, true)
+                );
+        webClient = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+    }
+
 
     public DynamicRoutePlugin(ServerConfigProperties properties) {
         super(properties);
-        webClient = WebClient.create();
     }
 
     @Override
@@ -68,10 +86,7 @@ public class DynamicRoutePlugin extends AbstractSeaPlugin {
 
     @Override
     public Mono<Void> execute(ServerWebExchange exchange, PluginChain pluginChain) {
-        String appName = parseAppName(exchange);
-        if (CollectionUtils.isEmpty(ServiceCache.getAllInstances(appName))) {
-            throw new SeaException(SeaExceptionEnum.SERVICE_NOT_FIND);
-        }
+        String appName = pluginChain.getAppName();
         ServiceInstance serviceInstance = chooseInstance(appName, exchange.getRequest());
         LOGGER.info("selected instance is [{}]", gson.toJson(serviceInstance));
         // request service
@@ -121,22 +136,40 @@ public class DynamicRoutePlugin extends AbstractSeaPlugin {
     }
 
     private String buildUrl(ServerWebExchange exchange, ServiceInstance serviceInstance) {
-        String path = exchange.getRequest().getPath().value().replaceFirst("/" + serviceInstance.getAppName(), "");
-        return "http://" + serviceInstance.getIp() + serviceInstance.getPort() + path;
+        ServerHttpRequest request = exchange.getRequest();
+        String query = request.getURI().getQuery();
+        String path = request.getPath().value().replaceFirst("/" + serviceInstance.getAppName(), "");
+        String url = "http://" + serviceInstance.getIp() + ":" + serviceInstance.getPort() + path;
+        if (!StringUtils.isEmpty(query)) {
+            url = url + "?" + query;
+        }
+        return url;
     }
 
     private ServiceInstance chooseInstance(String appName, ServerHttpRequest request) {
         List<ServiceInstance> serviceInstances = ServiceCache.getAllInstances(appName);
+
         if (CollectionUtils.isEmpty(serviceInstances)) {
             LOGGER.error("service instance of {} not find", appName);
             throw new SeaException(SeaExceptionEnum.SERVICE_NOT_FIND);
         }
-        // todo chose service version by route rule
+
         String version = matchAppVersion(appName, request);
+        if (StringUtils.isEmpty(version)) {
+            throw new SeaException("match app version error");
+        }
+
+        // filter serviceInstances by version
+        List<ServiceInstance> instances = new ArrayList<>();
+        for (ServiceInstance serviceInstance : serviceInstances) {
+            if (serviceInstance.getVersion().equals(version)) {
+                instances.add(serviceInstance);
+            }
+        }
 
         //Select an instance based on the load balancing algorithm
-        LoadBalance loadBalance = LoadBalanceFactory.getInstance(properties.getLoadBalance(), appName, "dev_1.0");
-        return loadBalance.chooseOne(serviceInstances);
+        LoadBalance loadBalance = LoadBalanceFactory.getInstance(properties.getLoadBalance(), appName, version);
+        return loadBalance.chooseOne(instances);
     }
 
     private String matchAppVersion(String appName, ServerHttpRequest request) {
@@ -172,10 +205,5 @@ public class DynamicRoutePlugin extends AbstractSeaPlugin {
             }
         }
         return false;
-    }
-
-    private String parseAppName(ServerWebExchange exchange) {
-        RequestPath path = exchange.getRequest().getPath();
-        return path.value().split("/")[1];
     }
 }

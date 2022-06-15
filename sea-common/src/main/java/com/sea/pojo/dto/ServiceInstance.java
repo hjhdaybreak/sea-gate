@@ -10,6 +10,8 @@ public class ServiceInstance {
 
     private String version;
 
+    private Integer weight;
+
     public String getAppName() {
         return appName;
     }
@@ -40,5 +42,13 @@ public class ServiceInstance {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public Integer getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Integer weight) {
+        this.weight = weight;
     }
 }

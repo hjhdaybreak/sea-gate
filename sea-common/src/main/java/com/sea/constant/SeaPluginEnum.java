@@ -2,8 +2,14 @@ package com.sea.constant;
 
 public enum SeaPluginEnum {
 
-    DYNAMIC_ROUTE("DynamicRoute", 1, "动态路由插件"),
+    /**
+     * DynamicRoute
+     */
+    DYNAMIC_ROUTE("DynamicRoute", 2, "动态路由插件"),
 
+    /**
+     * Auth
+     */
     AUTH("Auth", 1, "鉴权插件");
 
     private String name;

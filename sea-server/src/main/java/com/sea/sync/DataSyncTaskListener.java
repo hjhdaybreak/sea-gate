@@ -6,9 +6,11 @@ import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.ListView;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.sea.cache.PluginCache;
 import com.sea.cache.ServiceCache;
 import com.sea.config.ServerConfigProperties;
 import com.sea.constant.NacosConstants;
+import com.sea.constant.SeaPluginEnum;
 import com.sea.pojo.dto.ServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -16,11 +18,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.util.CollectionUtils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Configuration
 public class DataSyncTaskListener implements ApplicationListener<ContextRefreshedEvent> {
@@ -73,11 +74,22 @@ public class DataSyncTaskListener implements ApplicationListener<ContextRefreshe
                         continue;
                     }
                     ServiceCache.add(appName, buildServiceInstances(instanceList));
+                    PluginCache.add(appName, getEnabledPlugins(instanceList));
                 }
                 ServiceCache.removeExpired(appNames);
+                PluginCache.removeExpired(appNames);
             } catch (NacosException e) {
                 e.printStackTrace();
             }
+        }
+
+        //TODO ????
+        private List<String> getEnabledPlugins(List<Instance> instanceList) {
+            Instance instance = instanceList.get(0);
+            Map<String, String> metadata = instance.getMetadata();
+            // plugins: DynamicRoute,Auth
+            String plugins = metadata.getOrDefault("plugins", SeaPluginEnum.DYNAMIC_ROUTE.getName());
+            return new ArrayList<>(Arrays.asList(plugins.split(",")));
         }
 
         private List<ServiceInstance> buildServiceInstances(List<Instance> instanceList) {
@@ -89,6 +101,7 @@ public class DataSyncTaskListener implements ApplicationListener<ContextRefreshe
                 serviceInstance.setIp(instance.getIp());
                 serviceInstance.setPort(instance.getPort());
                 serviceInstance.setVersion(metadata.get("version"));
+                serviceInstance.setWeight((int) instance.getWeight());
                 list.add(serviceInstance);
             });
             return list;

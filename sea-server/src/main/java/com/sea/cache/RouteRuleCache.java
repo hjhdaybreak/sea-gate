@@ -10,39 +10,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class RouteRuleCache {
 
-    private static final Map<String, List<AppRuleDTO>> ROUTE_RULE_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, CopyOnWriteArrayList<AppRuleDTO>> ROUTE_RULE_MAP = new ConcurrentHashMap<>();
 
     public static void add(Map<String, List<AppRuleDTO>> map) {
-        ROUTE_RULE_MAP.putAll(map);
+        map.forEach((key, value) -> {
+            ROUTE_RULE_MAP.put(key, new CopyOnWriteArrayList(value));
+        });
     }
 
     public static void remove(Map<String, List<AppRuleDTO>> map) {
         for (Map.Entry<String, List<AppRuleDTO>> entry : map.entrySet()) {
             String appName = entry.getKey();
-
             List<Integer> ruleIds = new ArrayList<>();
             for (AppRuleDTO appRuleDTO : entry.getValue()) {
                 Integer id = appRuleDTO.getId();
                 ruleIds.add(id);
             }
-            List<AppRuleDTO> ruleDTOS = ROUTE_RULE_MAP.getOrDefault(appName, new ArrayList<>());
 
-            List<AppRuleDTO> leftRules = new ArrayList<>();
-            for (AppRuleDTO r : ruleDTOS) {
-                if (!ruleIds.contains(r.getId())) {
-                    leftRules.add(r);
-                }
-            }
+            CopyOnWriteArrayList<AppRuleDTO> ruleDTOS = ROUTE_RULE_MAP.getOrDefault(appName, new CopyOnWriteArrayList<>());
 
-            if (CollectionUtils.isEmpty(leftRules)) {
+            ruleDTOS.removeIf(r -> ruleIds.contains(r.getId()));
+
+            if (CollectionUtils.isEmpty(ruleDTOS)) {
                 // remove all
                 ROUTE_RULE_MAP.remove(appName);
             } else {
                 // remove some of them
-                ROUTE_RULE_MAP.put(appName, leftRules);
+                ROUTE_RULE_MAP.put(appName, ruleDTOS);
             }
         }
     }

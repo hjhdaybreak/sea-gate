@@ -1,6 +1,7 @@
 package com.sea.pojo.dto;
 
 public class AppRuleDTO {
+
     private Integer id;
 
     private Integer appId;

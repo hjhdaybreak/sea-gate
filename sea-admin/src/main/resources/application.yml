@@ -9,6 +9,13 @@ spring:
     password: hjh20001117
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-
 sea:
   server-web-socket-url: ws://127.0.0.1:9999
+  user-password-salt: d5ec0a02
+
+nacos:
+  discovery:
+    server-addr: 127.0.0.1:8848
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
